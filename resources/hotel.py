@@ -29,7 +29,7 @@ hoteis = [
 
 class Hoteis(Resource):
     def get(self):
-        return {'hoteis': hoteis}
+        return {'hoteis': [Hotel.json() for in HotelModel.query.all()]}
 
 class Hotel(Resource):
 
@@ -72,6 +72,10 @@ class Hotel(Resource):
         return hotel.json(), 201 #criado
 
     def delete(self, hotel_id):
-        global hoteis
-        hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
-        return {'messages': 'Hotel delete'}
+        hotel = HotelModel.find_hotel(hotel_id)
+        
+        if hotel: 
+            hotel.delete_hotel()
+            return {'messages': 'Hotel delete'}
+        else:
+            return {'message':'hotel not found'}, 404
