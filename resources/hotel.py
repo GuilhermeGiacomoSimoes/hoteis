@@ -29,7 +29,7 @@ hoteis = [
 
 class Hoteis(Resource):
     def get(self):
-        return {'hoteis': [Hotel.json() for in HotelModel.query.all()]}
+        return {'hoteis': [Hotel.json() for hotel in HotelModel.query.all()]}
 
 class Hotel(Resource):
 
