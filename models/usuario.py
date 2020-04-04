@@ -32,4 +32,9 @@ class UserModel(banco.Model):
         banco.session.delete(self)
         banco.session.commit()
 
-        
+    @classmethod
+    def find_by_login(cls, login):
+        user = cls.query.filter_by(login=login).first()
+        if user:
+            return user
+        return None
