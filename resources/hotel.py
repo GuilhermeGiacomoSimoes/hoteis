@@ -1,32 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
 
-hoteis = [
-    {
-        'hotel_id': 'alpha',
-        'nome': 'alpha hotel',
-        'estrelas': 4.3,
-        'diaria': 420.34,
-        'cidade': 'Rio de janeiro'
-    },
-
-    {
-        'hotel_id': 'bravo',
-        'nome': 'bravo hotel',
-        'estrelas': 4.4,
-        'diaria': 380.90,
-        'cidade': 'Florianópolis'
-    },
-
-    {
-        'hotel_id': 'charlie',
-        'nome': 'charlie hotel',
-        'estrelas': 3.9,
-        'diaria': 320.20,
-        'cidade': 'Florianópolis'
-    }
-]
-
 class Hoteis(Resource):
     def get(self):
         return {'hoteis': [hotel.json() for hotel in HotelModel.query.all()]}
@@ -34,8 +8,8 @@ class Hoteis(Resource):
 class Hotel(Resource):
 
     argumentos = reqparse.RequestParser()
-    argumentos.add_argument('nome')
-    argumentos.add_argument('estrelas')
+    argumentos.add_argument('nome', type=str, required=True, help="The fild nome cannot bt left blank")
+    argumentos.add_argument('estrelas', type=float, required=True, help="The field estrellas canno be left blank")
     argumentos.add_argument('diaria')
     argumentos.add_argument('cidade')
 
@@ -53,7 +27,12 @@ class Hotel(Resource):
         
         dados = Hotel.argumentos.parse_args()
         hotel = HotelModel(hotel_id, **dados)
-        hotel.save_hotel()
+        
+        try:
+            hotel.save_hotel()
+        except:
+            return {'message': 'An internal error'}, 500
+
         return hotel.json()
 
     def put(self, hotel_id):
@@ -67,15 +46,21 @@ class Hotel(Resource):
             return hotel_encontrado.json(), 200 #editado
 
         hotel = HotelModel(hotel_id, **dados)
-        hotel.save_hotel()
+        try:
+            hotel.save_hotel()
+        except:
+            return {'message':'An internal error'}, 500
 
         return hotel.json(), 201 #criado
 
     def delete(self, hotel_id):
         hotel = HotelModel.find_hotel(hotel_id)
         
-        if hotel: 
-            hotel.delete_hotel()
-            return {'messages': 'Hotel delete'}
-        else:
-            return {'message':'hotel not found'}, 404
+        try:
+            if hotel: 
+                hotel.delete_hotel()
+                return {'messages': 'Hotel delete'}
+            else:
+                return {'message':'hotel not found'}, 404
+        except:
+            return {'message':'An internal error'}, 500
