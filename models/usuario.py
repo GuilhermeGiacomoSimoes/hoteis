@@ -19,7 +19,8 @@ class UserModel(banco.Model):
 
     @classmethod
     def find_user(cls, user_id):
-        user = cls.query.filter_by(user_id=user_id).first()  # select *from users where user_id = x limit 1
+        # select *from users where user_id = x limit 1
+        user = cls.query.filter_by(user_id=user_id).first()  
         if user:
             return user
         return None
